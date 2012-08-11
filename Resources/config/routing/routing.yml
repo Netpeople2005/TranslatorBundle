@@ -1,9 +1,7 @@
 knplabs_translator_get:
-    pattern:  /{id}/{domain}/{locale}
+    pattern:  /
     defaults: 
         _controller: knplabs_translator.controller.translator:getAction
-        domain: messages
-        locale: ~
     requirements: { _method: GET }
 
 knplabs_translator_put:

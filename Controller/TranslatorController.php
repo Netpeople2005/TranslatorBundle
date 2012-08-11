@@ -11,7 +11,7 @@
 namespace Knp\Bundle\TranslatorBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Knp\Bundle\TranslatorBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Bundle\TranslatorBundle\Exception\InvalidTranslationKeyException;
 
@@ -29,11 +29,18 @@ class TranslatorController
         $this->logger = $logger;
     }
 
-    public function getAction($id, $domain, $locale)
+    public function getAction()
     {
-        $trans = $this->translator->trans($id, array(), $domain, $locale);
+        $id = urldecode($this->request->get('id'));
+        $domain = urldecode($this->request->get('domain'));
+        $locale = urldecode($this->request->get('locale'));
+        $parameters = $this->request->get('parameters');
+        
+        $this->translator->trans($id, $parameters, $domain, $locale);
+        
+        $data = $this->translator->getCurrentPageMessages(md5($id));
 
-        return new Response($trans);
+        return new Response(json_encode($data),200, array('Content-Type' => 'application/json'));
     }
 
     public function putAction()

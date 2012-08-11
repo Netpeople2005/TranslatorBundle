@@ -18,6 +18,11 @@ var Message = Backbone.Model.extend({
         parameters:null,
         domain:null,
         locale:null
+    },
+    initialize:function(){
+        this.on('change:parameters',function(model, params){
+            model.set('parameters',model.previous('parameters'));
+        },this);
     }
 });
 
@@ -30,7 +35,8 @@ var MessageView = Backbone.View.extend({
     events:{
         'click .translator-save':'updateModel',
         'click .translator-close':'hideForm',
-        'click .translator-link':'renderForm'
+        'click .translator-link':'renderForm',
+        'change .translator-domain-select':'getModelByLocale'
     },
     initialize:function(){
         this.template = _.template($("#tpl-translator-form").html());
@@ -38,46 +44,67 @@ var MessageView = Backbone.View.extend({
     },
     render:function(){
         this.$el.html(this.template(this.model.toJSON()));
-        console.log(this.$el)
+        _.each(TranslatorLanguages,function(lan){
+            this.$(".translator-domain-select").append('<option>' + lan + '</option>');            
+        },this);
+        this.$(".translator-domain-select").val(this.model.get('locale'));
         return this.$el;
     },
     updateModel:function(){
-        console.log(this.$el.toJSON())
         var vista = this;
         this.model.save(this.$el.toJSON(),{
             success:function(model){
-                console.log("listo")
                 vista.hideForm();
             }
         })
     },
     renderForm:function(){
         $("#translator-modal-background").fadeIn();
-        $("#translator-list").css({'position' : 'static' ,'visibility':'hidden'});
+        $("#translator-list").css({
+            'position' : 'static' ,
+            'visibility':'hidden'
+        });
         this.$('.translator-modal').slideDown();    
     },
     hideForm:function(){
         $("#translator-modal-background").fadeOut();
-        $("#translator-list").css({'position' : 'absolute','visibility':'visible'});
+        $("#translator-list").css({
+            'position' : 'absolute',
+            'visibility':'visible'
+        });
         this.$('.translator-modal').fadeOut(0); 
+    },
+    getModelByLocale:function(){
+        this.model.set('locale',this.$(".translator-domain-select").val());
+        var vista = this;
+        $.getJSON(TranslatorURL, this.model.toJSON(),function(data){
+            vista.$('[name=value]').val(data.value);
+            vista.model.set('value',data.value);
+        });
     }
 });
 
 
 $(function(){
-    $("#translator-list").css({'top' : calculeTranslatorListTop()});
+    $("#translator-list").css({
+        'top' : calculeTranslatorListTop()
+        });
     $("#translator-list").on('mouseover',function(){
         $("#translator-list").stop();
-        $(this).animate({'top': "-5px"});
+        $(this).animate({
+            'top': "-5px"
+        });
     });
     $("#translator-list").on('mouseout',function(){
         $("#translator-list").stop();
-        $(this).animate({'top': calculeTranslatorListTop() });
+        $(this).animate({
+            'top': calculeTranslatorListTop()
+        });
     });
 });
 
 function calculeTranslatorListTop(){
-    return 5 - $("#translator-list").height();
+    return 20 - $("#translator-list").height();
 }
 
 

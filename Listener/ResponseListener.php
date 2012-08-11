@@ -98,8 +98,12 @@ class ResponseListener
             <div><label>ID :</label><input type="text" name="id" value="<%= id %>" readonly /></div>
             <div><label>Valor: </label><textarea name="value"><%= value %></textarea></div>
             <div><label>Parametros: </label><textarea name="parameters"><%= JSON.stringify(parameters) %></textarea></div>
-            <div><label>Dominio: </label><input type="text" name="domain" value="<%= domain %>"/></div>
-            <div><label>Locale: </label><input type="text" name="locale" value="<%= locale %>"/></div>
+            <div><label>Dominio: </label>
+                <input name="domain" value="<%= domain %>" type="text" />
+            </div>
+            <div><label>Locale: </label>
+            <select name="locale" class="translator-domain-select"></select>
+            </div>
         </div>
         <hr/>
         <div class="translator-buttons">
@@ -124,12 +128,18 @@ HTML
             $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
 
             $models = json_encode(array_values($this->translator->getCurrentPageMessages()));
+            
+            $locales = $this->translator->getLocales();
+            natsort($locales);
+            $locales = json_encode(array_values($locales));
+            
 
             $script = <<<HTML
 <div id="translator-modal-background"></div>
 <div id="translator-list"></div>
 <script type="text/javascript">
     var Messages = new MessagesCollection($models);
+    var TranslatorLanguages = $locales;
     Messages.each(function(message){
         $("#translator-list").append(new MessageView({ model: message }).render());
     });
