@@ -89,6 +89,7 @@ class ResponseListener
             $scripts = <<<HTML
 <script type="text/javascript">var TranslatorURL = "$url";</script>
 <script type="text/tpl" id="tpl-translator-form">
+    <a href="#" class="translator-link" title="<%= value %>"><%= id %></a>
     <div class="translator-modal">
         <h3>Editar Etiqueta</h3>
         <span class="translator-close">Close</span>
@@ -96,6 +97,7 @@ class ResponseListener
         <div class="translator-form">
             <div><label>ID :</label><input type="text" name="id" value="<%= id %>" readonly /></div>
             <div><label>Valor: </label><textarea name="value"><%= value %></textarea></div>
+            <div><label>Parametros: </label><textarea name="parameters"><%= JSON.stringify(parameters) %></textarea></div>
             <div><label>Dominio: </label><input type="text" name="domain" value="<%= domain %>"/></div>
             <div><label>Locale: </label><input type="text" name="locale" value="<%= locale %>"/></div>
         </div>
@@ -124,13 +126,15 @@ HTML
             $models = json_encode(array_values($this->translator->getCurrentPageMessages()));
 
             $script = <<<HTML
+<div id="translator-modal-background"></div>
+<div id="translator-list"></div>
 <script type="text/javascript">
     var Messages = new MessagesCollection($models);
     Messages.each(function(message){
-        new MessageView({ model: message }).render();
+        $("#translator-list").append(new MessageView({ model: message }).render());
     });
+    $("#translator-list").append("<hr/><h4 style='margin: 5px;'>Editar Etiquetas</h4>");
 </script>
-<div id="translator-modal-background"></div>
 HTML
             ;
 
@@ -139,7 +143,7 @@ HTML
 
             $content = $substrFunction($content, 0, $pos) . $scripts . $substrFunction($content, $pos);
             $replacement = '<span class="translator-label translator-label-$1">$2<span class="translator-edit">Editar</span></span>';
-            $content = preg_replace('/\[T-(.+?)\](.+?)\[\/T\]/mi', $replacement, $content);
+            //$content = preg_replace('/\[T-(.+?)\](.+?)\[\/T\]/mi', $replacement, $content);
             $response->setContent($content);
         }
     }

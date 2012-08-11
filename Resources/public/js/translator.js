@@ -15,6 +15,7 @@ var Message = Backbone.Model.extend({
         id: null,
         index:null,
         value:null,
+        parameters:null,
         domain:null,
         locale:null
     }
@@ -29,15 +30,15 @@ var MessageView = Backbone.View.extend({
     events:{
         'click .translator-save':'updateModel',
         'click .translator-close':'hideForm',
-        'click .translator-edit':'renderForm'
+        'click .translator-link':'renderForm'
     },
     initialize:function(){
-        this.$el = $(".translator-label-" + this.model.get('index'));
         this.template = _.template($("#tpl-translator-form").html());
         return this;
     },
     render:function(){
-        this.$el.append(this.template(this.model.toJSON()));
+        this.$el.html(this.template(this.model.toJSON()));
+        console.log(this.$el)
         return this.$el;
     },
     updateModel:function(){
@@ -52,18 +53,32 @@ var MessageView = Backbone.View.extend({
     },
     renderForm:function(){
         $("#translator-modal-background").fadeIn();
-        this.$el.css({ 'position' : 'static' });
-        this.$('.translator-edit').css('visibility','hidden');    
+        $("#translator-list").css({'position' : 'static' ,'visibility':'hidden'});
         this.$('.translator-modal').slideDown();    
     },
     hideForm:function(){
         $("#translator-modal-background").fadeOut();
-        this.$el.css({ 'position' : 'relative' });
+        $("#translator-list").css({'position' : 'absolute','visibility':'visible'});
         this.$('.translator-modal').fadeOut(0); 
-        this.$('.translator-edit').css('visibility','visible');    
     }
 });
 
+
+$(function(){
+    $("#translator-list").css({'top' : calculeTranslatorListTop()});
+    $("#translator-list").on('mouseover',function(){
+        $("#translator-list").stop();
+        $(this).animate({'top': "-5px"});
+    });
+    $("#translator-list").on('mouseout',function(){
+        $("#translator-list").stop();
+        $(this).animate({'top': calculeTranslatorListTop() });
+    });
+});
+
+function calculeTranslatorListTop(){
+    return 5 - $("#translator-list").height();
+}
 
 
 

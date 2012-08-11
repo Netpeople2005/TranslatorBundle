@@ -37,7 +37,7 @@ class Translator extends BaseTranslator
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        $trsns = parent::trans($id, $parameters, $domain, $locale);
+        $trans = parent::trans($id, $parameters, $domain, $locale);
         $index = md5($id);
 
         if (!$locale) {
@@ -45,10 +45,10 @@ class Translator extends BaseTranslator
         }
 
         $value = $this->getCatalog($locale)->get($id, $domain);
-
-
-        $this->currentPageMessages[$index] = compact('id', 'domain', 'locale', 'index', 'value');
-        return $this->wrap($index, $trsns);
+        
+        $this->currentPageMessages[$index] = compact('id', 'domain', 'locale', 'index', 'value', 'parameters', 'trans');        return $trans;
+        
+        return $trans;
     }
 
     public function all()
@@ -208,10 +208,4 @@ class Translator extends BaseTranslator
 
         return $resources;
     }
-
-    private function wrap($index, $value)
-    {
-        return sprintf('[T-%s]%s[/T]', $index, $value);
-    }
-
 }
