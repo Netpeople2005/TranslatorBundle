@@ -7,8 +7,9 @@ knplabs_translator_get:
     requirements: { _method: GET }
 
 knplabs_translator_put:
-    pattern:  /
+    pattern:  /{basura}
     defaults: 
         _controller: knplabs_translator.controller.translator:putAction
+        basura: null
     requirements: { _method: PUT }
 

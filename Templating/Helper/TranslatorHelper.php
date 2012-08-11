@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper as BaseTra
  */
 class TranslatorHelper extends BaseTranslatorHelper
 {
+
     /**
      * @see TranslatorInterface::trans()
      */
@@ -24,7 +25,7 @@ class TranslatorHelper extends BaseTranslatorHelper
 
         $trans = parent::trans($id, $parameters, $domain, $locale);
 
-        return $this->wrap($id, $trans, $domain, $locale);
+        return $trans;//$this->wrap($id, $trans, $domain, $locale);
     }
 
     /**
@@ -49,8 +50,9 @@ class TranslatorHelper extends BaseTranslatorHelper
      */
     public function wrap($id, $trans, $domain = 'messages', $locale = null)
     {
-        $startTag = sprintf('[T id="%s" domain="%s" locale="%s"]', $id, $domain, $locale);
+        $startTag = sprintf('<span class="translator-label translator-label-%s">', md5($id));
 
-        return sprintf('%s%s%s', $startTag, $trans, '[/T]');
+        return sprintf('%s%s%s', $startTag, $trans, '</span>');
     }
+
 }

@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of the Symfony package.
  *
@@ -25,9 +24,32 @@ use Knp\Bundle\TranslatorBundle\Exception\InvalidTranslationKeyException;
  */
 class Translator extends BaseTranslator
 {
+
     private $dumpers = array();
     private $locales = array();
     private $fallbackLocale;
+    private $currentPageMessages = array();
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+    {
+        $trsns = parent::trans($id, $parameters, $domain, $locale);
+        $index = md5($id);
+
+        if (!$locale) {
+            $locale = $this->getLocale();
+        }
+
+        $value = $this->getCatalog($locale)->get($id, $domain);
+
+
+        $this->currentPageMessages[$index] = compact('id', 'domain', 'locale', 'index', 'value');
+        return $this->wrap($index, $trsns);
+    }
 
     public function all()
     {
@@ -37,6 +59,14 @@ class Translator extends BaseTranslator
         }
 
         return $translations;
+    }
+
+    public function getCurrentPageMessages($index = NULL)
+    {
+        if ($index) {
+            return array_key_exists($index, $this->currentPageMessages) ? $this->currentPageMessages[$index] : NULL;
+        }
+        return $this->currentPageMessages;
     }
 
     public function isTranslated($id, $domain, $locale)
@@ -93,7 +123,7 @@ class Translator extends BaseTranslator
         }
 
         throw new \InvalidArgumentException(
-            sprintf('The locale "%s" does not exist in Translations catalogues', $locale)
+                sprintf('The locale "%s" does not exist in Translations catalogues', $locale)
         );
     }
 
@@ -127,12 +157,13 @@ class Translator extends BaseTranslator
      */
     public function update($id, $value, $domain, $locale)
     {
+        $success = FALSE;
+
         if (empty($id)) {
             throw new InvalidTranslationKeyException('Empty key not allowed');
         }
         $resources = $this->getResources($locale, $domain);
 
-        $success = false;
         foreach ($resources as $resource) {
             if ($dumper = $this->getDumper($resource)) {
                 $success = $dumper->update($resource, $id, $value);
@@ -177,4 +208,10 @@ class Translator extends BaseTranslator
 
         return $resources;
     }
+
+    private function wrap($index, $value)
+    {
+        return sprintf('[T-%s]%s[/T]', $index, $value);
+    }
+
 }

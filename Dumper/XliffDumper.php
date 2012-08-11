@@ -12,6 +12,7 @@ use \DOMXPath;
 
 class XliffDumper implements DumperInterface
 {
+
     private $currentLibXmlErrorHandler;
 
     public function supports(FileResource $resource)
@@ -28,9 +29,9 @@ class XliffDumper implements DumperInterface
      */
     public function update(FileResource $resource, $id, $value)
     {
-        if('' === $id) {
+        if ('' === $id) {
             throw new InvalidTranslationKeyException(
-                sprintf('An empty key can not be used in "%s"', $resource->getResource())
+                    sprintf('An empty key can not be used in "%s"', $resource->getResource())
             );
         }
         $document = $this->getDomDocument($resource);
@@ -106,7 +107,7 @@ class XliffDumper implements DumperInterface
 
     private function checkErrors()
     {
-        if($errors = $this->getXmlErrors()) {
+        if ($errors = $this->getXmlErrors()) {
             libxml_use_internal_errors($this->currentLibXmlErrorHandler);
             throw new \InvalidArgumentException(implode("\n", $errors));
         }
@@ -121,13 +122,7 @@ class XliffDumper implements DumperInterface
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ? $error->file : 'n/a',
-                $error->line,
-                $error->column
+            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)', LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR', $error->code, trim($error->message), $error->file ? $error->file : 'n/a', $error->line, $error->column
             );
         }
 
@@ -135,13 +130,14 @@ class XliffDumper implements DumperInterface
 
         return $errors;
     }
+
 }
 
 function dom_xpath_max($that, $nodes)
 {
     usort($nodes, function($a, $b) {
-        return $b->value > $a->value;
-    });
+                return $b->value > $a->value;
+            });
 
     return $that[0]->value == $nodes[0]->value;
 }

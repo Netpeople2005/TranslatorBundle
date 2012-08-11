@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of the Symfony package.
  *
@@ -17,6 +16,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\templating\Helper\CoreAssetsHelper;
 use Symfony\Component\Routing\RouterInterface;
+use Knp\Bundle\TranslatorBundle\Translation\Translator;
 
 /**
  * ResponseListener injects the translator js code.
@@ -28,15 +28,23 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class ResponseListener
 {
+
     private $assetHelper;
     private $router;
     private $includeVendorAssets;
 
-    public function __construct(CoreAssetsHelper $assetHelper, RouterInterface $router, $includeVendorAssets = true)
+    /**
+     *
+     * @var Translator 
+     */
+    private $translator;
+
+    public function __construct(CoreAssetsHelper $assetHelper, RouterInterface $router, Translator $translator, $includeVendorAssets = true)
     {
         $this->assetHelper = $assetHelper;
         $this->router = $router;
         $this->includeVendorAssets = $includeVendorAssets;
+        $this->translator = $translator;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -76,29 +84,62 @@ class ResponseListener
 
         if (false !== $pos = $posrFunction($content, '</body>')) {
 
-            $scripts = '';
-            if(true === $this->includeVendorAssets) {
-                $url = $this->assetHelper->getUrl('bundles/knptranslator/js/ext-core.js');
-                $scripts = sprintf('<script type="text/javascript" src="%s"></script>', $url)."\n";
-            }
+            $url = $this->router->generate('knplabs_translator_put');
+
+            $scripts = <<<HTML
+<script type="text/javascript">var TranslatorURL = "$url";</script>
+<script type="text/tpl" id="tpl-translator-form">
+    <div class="translator-modal">
+        <h3>Editar Etiqueta</h3>
+        <span class="translator-close">Close</span>
+        <hr/>
+        <div class="translator-form">
+            <div><label>ID :</label><input type="text" name="id" value="<%= id %>" readonly /></div>
+            <div><label>Valor: </label><textarea name="value"><%= value %></textarea></div>
+            <div><label>Dominio: </label><input type="text" name="domain" value="<%= domain %>"/></div>
+            <div><label>Locale: </label><input type="text" name="locale" value="<%= locale %>"/></div>
+        </div>
+        <hr/>
+        <div class="translator-buttons">
+            <input type="button" class="translator-save" value="Guardar"/>
+            <input type="button" class="translator-close" value="Cerrar"/>
+        </div>
+    </div>
+</script>
+HTML
+            ;
+
+            $url = $this->assetHelper->getUrl('bundles/knptranslator/js/jquery.min.js');
+            $scripts .= PHP_EOL . sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
+
+            $url = $this->assetHelper->getUrl('bundles/knptranslator/js/underscore-min.js');
+            $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
+
+            $url = $this->assetHelper->getUrl('bundles/knptranslator/js/backbone-min.js');
+            $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
 
             $url = $this->assetHelper->getUrl('bundles/knptranslator/js/translator.js');
-            $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url)."\n";
+            $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
 
+            $models = json_encode(array_values($this->translator->getCurrentPageMessages()));
 
-            $script= <<<HTML
+            $script = <<<HTML
 <script type="text/javascript">
-    var knpTranslator;
-    Ext.onReady(function() {
-        knpTranslator = new Knp.Translator({
-            url: '%s'
-        });
+    var Messages = new MessagesCollection($models);
+    Messages.each(function(message){
+        new MessageView({ model: message }).render();
     });
 </script>
-HTML;
-            $scripts .= sprintf($script, $this->router->generate('knplabs_translator_put'))."\n";
+<div id="translator-modal-background"></div>
+HTML
+            ;
 
-            $content = $substrFunction($content, 0, $pos).$scripts.$substrFunction($content, $pos);
+
+            $scripts .= $script . PHP_EOL;
+
+            $content = $substrFunction($content, 0, $pos) . $scripts . $substrFunction($content, $pos);
+            $replacement = '<span class="translator-label translator-label-$1">$2<span class="translator-edit">Editar</span></span>';
+            $content = preg_replace('/\[T-(.+?)\](.+?)\[\/T\]/mi', $replacement, $content);
             $response->setContent($content);
         }
     }
@@ -125,8 +166,9 @@ HTML;
             $url = $this->assetHelper->getUrl('bundles/knptranslator/css/translator.css');
             $links = sprintf('<link rel="stylesheet" href="%s" />', $url);
 
-            $content = $substrFunction($content, 0, $pos).$links.$substrFunction($content, $pos);
+            $content = $substrFunction($content, 0, $pos) . $links . $substrFunction($content, $pos);
             $response->setContent($content);
         }
     }
+
 }
