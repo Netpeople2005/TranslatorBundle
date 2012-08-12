@@ -35,29 +35,33 @@ class TranslatorController
         $domain = urldecode($this->request->get('domain'));
         $locale = urldecode($this->request->get('locale'));
         $parameters = $this->request->get('parameters');
-        
+
         $this->translator->trans($id, $parameters, $domain, $locale);
-        
+
         $data = $this->translator->getCurrentPageMessages(md5($id));
 
-        return new Response(json_encode($data),200, array('Content-Type' => 'application/json'));
+        return new Response(json_encode($data), 200, array('Content-Type' => 'application/json'));
     }
 
-    public function putAction()
+    public function postAction()
     {
         $error = NULL;
-        $data = json_decode($this->request->getContent(), TRUE);
-        extract($data, EXTR_OVERWRITE);
+        $id = $this->request->get('id');
+        $value = $this->request->get('value');
+        $domain = $this->request->get('domain');
+        $locale = $this->request->get('locale');
+        $parameters = $this->request->get('parameters');
         try {
             $success = $this->translator->update($id, $value, $domain, $locale);
             $trans = $value;
         } catch (InvalidTranslationKeyException $e) {
             $success = false;
-            $trans = $this->translator->trans($id, array(), $domain, $locale);
+            $trans = $this->translator->trans($id, $parameters, $domain, $locale);
             $error = $e->getMessage();
         }
 
-        return new Response(json_encode($data), $error ? 500 : 200, array('Content-Type' => 'application/json'));
+        return new Response(json_encode(compact('id', 'value', 'domain')),
+                        $error ? 500 : 200, array('Content-Type' => 'application/json'));
     }
 
 }

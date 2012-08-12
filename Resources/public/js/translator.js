@@ -1,111 +1,98 @@
 $.fn.toJSON=function(){
     var data = {};
     this.each(function(form) {
-        form = $(':input', this);
-        form.each(function(index) {
+        var inputs = $(':input', this);
+        inputs.each(function(index) {
             data[$(this).attr('name')] = $(this).val();
         });
     });
     return data;
 };
 
-var Message = Backbone.Model.extend({
-    urlRoot: TranslatorURL,
-    defaults:{
-        id: null,
-        index:null,
-        value:null,
-        parameters:null,
-        domain:null,
-        locale:null
-    },
-    initialize:function(){
-        this.on('change:parameters',function(model, params){
-            model.set('parameters',model.previous('parameters'));
-        },this);
+$.fn.populate=function(json){
+    if ( $.type(json) !== 'object' ){
+        return;
     }
-});
-
-var MessagesCollection = Backbone.Collection.extend({
-    url: TranslatorURL,
-    model: Message
-});
-
-var MessageView = Backbone.View.extend({
-    events:{
-        'click .translator-save':'updateModel',
-        'click .translator-close':'hideForm',
-        'click .translator-link':'renderForm',
-        'change .translator-domain-select':'getModelByLocale'
-    },
-    initialize:function(){
-        this.template = _.template($("#tpl-translator-form").html());
-        return this;
-    },
-    render:function(){
-        this.$el.html(this.template(this.model.toJSON()));
-        _.each(TranslatorLanguages,function(lan){
-            this.$(".translator-domain-select").append('<option>' + lan + '</option>');            
-        },this);
-        this.$(".translator-domain-select").val(this.model.get('locale'));
-        return this.$el;
-    },
-    updateModel:function(){
-        var vista = this;
-        this.model.save(this.$el.toJSON(),{
-            success:function(model){
-                vista.hideForm();
+    this.each(function(form) {
+        var inputs = $(':input', this);
+        inputs.each(function(index) {
+            if ( $(this).attr('name') in json ){
+                console.info($(this).attr('name'));
+                $(this).val(json[$(this).attr('name')]);                
             }
-        })
-    },
-    renderForm:function(){
-        $("#translator-modal-background").fadeIn();
-        $("#translator-list").css({
-            'position' : 'static' ,
-            'visibility':'hidden'
-        });
-        this.$('.translator-modal').slideDown();    
-    },
-    hideForm:function(){
-        $("#translator-modal-background").fadeOut();
-        $("#translator-list").css({
-            'position' : 'absolute',
-            'visibility':'visible'
-        });
-        this.$('.translator-modal').fadeOut(0); 
-    },
-    getModelByLocale:function(){
-        this.model.set('locale',this.$(".translator-domain-select").val());
-        var vista = this;
-        $.getJSON(TranslatorURL, this.model.toJSON(),function(data){
-            vista.$('[name=value]').val(data.value);
-            vista.model.set('value',data.value);
-        });
-    }
-});
-
-
-$(function(){
-    $("#translator-list").css({
-        'top' : calculeTranslatorListTop()
-        });
-    $("#translator-list").on('mouseover',function(){
-        $("#translator-list").stop();
-        $(this).animate({
-            'top': "-5px"
         });
     });
-    $("#translator-list").on('mouseout',function(){
-        $("#translator-list").stop();
+};
+
+$(function(){
+    $.each(TRANSLATOR_LOCALES, function(indice, valor){
+        $("#translator-form .translator-form select[name=locale]").append('<option>' + valor + '</option>');
+    });
+    $("#translator-form .translator-form select[name=locale]").on('change',function(){
+        var json = $("#translator-form .translator-form").toJSON();
+        json.id = $("#translator-form .translator-form").data('id');
+        json.parameters = $("#translator-form .translator-form").data('parameters');
+        translatorLoading(true);
+        $.getJSON(TRANSLATOR_URL, json , function(json){
+            translatorLoading(false);
+            $("#translator-form .translator-form").populate(json);
+        });
+    });
+    $("#translator-list").css({
+        'top' : calculeTranslatorListTop()
+    });
+    $("#translator-list ul li a").on('click',function(){
+        $("#translator-list #translator-form").css({
+            'top':$(this).offset().top - 5
+        });
+        $(this).parent().append($("#translator-list #translator-form").show());
+        $("#translator-form .translator-form").populate($(this).data('json'));
+        $("#translator-form .translator-form").data({ 
+            id : $(this).data('json').id, 
+            parameters : $(this).data('json').parameters
+        });
+    });
+    $("#translator-list").on('mouseenter',function(){
+        $(this).stop();
+        $(this).animate({
+            'top': "-1px"
+        });
+    });
+    $("#translator-list").on('mouseleave',function(){
+        $(this).stop();
         $(this).animate({
             'top': calculeTranslatorListTop()
+        });
+        $("#translator-list #translator-form").hide();
+    });
+    $("#translator-form form").on('submit',function(event){
+        event.preventDefault();
+        var json = $("#translator-form .translator-form").toJSON();
+        json.id = $("#translator-form .translator-form").data('id');
+        json.parameters = $("#translator-form .translator-form").data('parameters');
+        translatorLoading(true);
+        $.post(TRANSLATOR_URL, json , function(json){
+            translatorLoading(false,"Guardado con Exito");
+            $("#translator-form .translator-form").populate(json);
         });
     });
 });
 
 function calculeTranslatorListTop(){
-    return 20 - $("#translator-list").height();
+    return 25 - $("#translator-list").height();
 }
 
+function translatorLoading(show, mensaje){
+    if ( show === true ){
+        $(".translator-buttons :submit").attr('disabled','disabled');
+        $(".translator-buttons img").show(0);  
+        $("#translator-message").html("");
+    }else if(show === false){
+        $(".translator-buttons :submit").attr('disabled',false);
+        $(".translator-buttons img").hide(0);
+        $("#translator-message").html(mensaje == 'undefinde' ? '' : mensaje);
+        $("#translator-message").fadeOut(6000);
+    }
+}
 
 

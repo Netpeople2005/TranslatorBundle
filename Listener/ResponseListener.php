@@ -84,76 +84,48 @@ class ResponseListener
 
         if (false !== $pos = $posrFunction($content, '</body>')) {
 
-            $url = $this->router->generate('knplabs_translator_put');
-
-            $scripts = <<<HTML
-<script type="text/javascript">var TranslatorURL = "$url";</script>
-<script type="text/tpl" id="tpl-translator-form">
-    <a href="#" class="translator-link" title="<%= value %>"><%= id %></a>
-    <div class="translator-modal">
-        <h3>Editar Etiqueta</h3>
-        <span class="translator-close">Close</span>
-        <hr/>
-        <div class="translator-form">
-            <div><label>ID :</label><input type="text" name="id" value="<%= id %>" readonly /></div>
-            <div><label>Valor: </label><textarea name="value"><%= value %></textarea></div>
-            <div><label>Parametros: </label><textarea name="parameters"><%= JSON.stringify(parameters) %></textarea></div>
-            <div><label>Dominio: </label>
-                <input name="domain" value="<%= domain %>" type="text" />
-            </div>
-            <div><label>Locale: </label>
-            <select name="locale" class="translator-domain-select"></select>
-            </div>
-        </div>
-        <hr/>
-        <div class="translator-buttons">
-            <input type="button" class="translator-save" value="Guardar"/>
-            <input type="button" class="translator-close" value="Cerrar"/>
-        </div>
-    </div>
-</script>
-HTML
-            ;
-
             $url = $this->assetHelper->getUrl('bundles/knptranslator/js/jquery.min.js');
-            $scripts .= PHP_EOL . sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
+            $scripts = PHP_EOL . sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
 
-            $url = $this->assetHelper->getUrl('bundles/knptranslator/js/underscore-min.js');
-            $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
-
-            $url = $this->assetHelper->getUrl('bundles/knptranslator/js/backbone-min.js');
-            $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
+            $url = $this->router->generate('knplabs_translator_put');
+            $locales = $this->translator->getLocales();
+            natsort($locales);
+            $locales = json_encode(array_values($locales));
+            $scripts .= sprintf('<script type="text/javascript">var TRANSLATOR_URL = "%s";var TRANSLATOR_LOCALES = %s;</script>', $url, $locales) . PHP_EOL;
 
             $url = $this->assetHelper->getUrl('bundles/knptranslator/js/translator.js');
             $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
 
-            $models = json_encode(array_values($this->translator->getCurrentPageMessages()));
+            $html = $scripts . '<div id="translator-list"><div class="translator-list"><ul>' . PHP_EOL;
+            foreach ($this->translator->getCurrentPageMessages()as $e) {
+                $html .= '<li><a href="#" title="' . htmlspecialchars($e['trans']) . '" data-json="'
+                        . htmlspecialchars(json_encode($e)) . '">'
+                        . htmlspecialchars(substr($e['id'], 0, 80)) . '</a></li>' . PHP_EOL;
+            }
             
-            $locales = $this->translator->getLocales();
-            natsort($locales);
-            $locales = json_encode(array_values($locales));
-            
+            $img = $this->assetHelper->getUrl('bundles/knptranslator/img/cargando.gif');
 
-            $script = <<<HTML
-<div id="translator-modal-background"></div>
-<div id="translator-list"></div>
-<script type="text/javascript">
-    var Messages = new MessagesCollection($models);
-    var TranslatorLanguages = $locales;
-    Messages.each(function(message){
-        $("#translator-list").append(new MessageView({ model: message }).render());
-    });
-    $("#translator-list").append("<hr/><h4 style='margin: 5px;'>Editar Etiquetas</h4>");
-</script>
-HTML
-            ;
+            $html .= <<<HTML
+</ul><hr/><h4 style="margin: 5px;">Editar Etiquetas</h4></div>
+<div id="translator-form">
+    <form onsubmit="return false;" method="post">
+        <h3>Editar Etiqueta</h3>
+        <hr/>
+        <div class="translator-form">
+            <div><label>Locale: </label><select name="locale"></select></div>
+            <div><label>Dominio: </label><input name="domain" type="text" readonly="readonly" /></div>
+            <div><label>Valor: </label><textarea name="value"></textarea></div>
+        </div>
+        <hr/>
+        <div class="translator-buttons">
+            <span id="translator-message"></span><img src="$img" />
+            <input type="submit" value="Guardar"/>
+        </div>
+    <form>
+</div></div>
+HTML;
 
-
-            $scripts .= $script . PHP_EOL;
-
-            $content = $substrFunction($content, 0, $pos) . $scripts . $substrFunction($content, $pos);
-            $replacement = '<span class="translator-label translator-label-$1">$2<span class="translator-edit">Editar</span></span>';
-            //$content = preg_replace('/\[T-(.+?)\](.+?)\[\/T\]/mi', $replacement, $content);
+            $content = $substrFunction($content, 0, $pos) . $html . $substrFunction($content, $pos);
             $response->setContent($content);
         }
     }

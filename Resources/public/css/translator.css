@@ -1,89 +1,46 @@
-.translator-label{
-    position: relative;
-}
-
-.translator-label .translator-edit{
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    background-color: #ccccff;
-    font-size: 12px;
-    display: none;
-    z-index: 1000;
-    cursor: pointer;
-    padding: 2px;
-}
-
-.translator-modal{
-    display: none;
+#translator-form{
     position: absolute;
     width: 540px;
     min-height: 180px;
-    background-color: white;
-    border: 1px solid black;
-    top: 50%;
-    left: 50%;
-    z-index: 1000;
-    margin-left: -270px;
-    margin-top: -200px;
-    padding: 45px 20px 10px 20px;
-    visibility: visible;
+    background-color: #E3E2E2;
+    border: 1px solid #BBB;
+    top: 0px;
+    left: -561px;
+    z-index: -1 !important;;
+    padding: 10px;
+    display: none;
+    line-height: 25px;
 }
-
-.translator-modal h3{
-    position: absolute;
-    top: 20px;
-    left: 20px;  
+#translator-form h3{
+    margin: 5px;
     padding: 0px;
-    margin: 0px;
 }
-.translator-modal span.translator-close{
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;    
+#translator-form label{
+    display: inline-block;
+    width: 105px;
+    vertical-align: top;
+    font-weight: bold;
 }
-
-.translator-modal .translator-buttons{
+#translator-form .translator-buttons{
     text-align: right;
 }
-#translator-modal-background{
-    display: none;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 999;
-    background-color: black;
-    width: 100%;
-    height: 100%;
-    opacity: 0.7;
+#translator-form input[type=text],
+#translator-form textarea,
+#translator-form select{
+    width: 430px;    
+    max-width: 430px;
+    min-width: 430px;
+    background-color: white;
+    border: 1px solid #D1CCCC;
+    margin: 0px;
+    padding: 0px;
 }
-
-.translator-form{
-    padding: 5px;
-    min-width: 250px;
-    z-index: 1000;
-    line-height: 30px;
+#translator-message{
+    float: left;
+    font-size: 12px;
+    font-weight: normal;
+    color: #888;
 }
-
-.translator-label:hover .translator-edit{
-    display: block;
-}
-
-.translator-form label{
-    display: inline-block;
-    width: 120px;
-    vertical-align: top;
-}
-
-.translator-form input[type=text],
-.translator-form textarea,
-.translator-form select{
-    width: 400px;    
-    max-width: 400px;
-    min-width: 400px;
-}
-
 #translator-list{
     position: absolute;
     right: 10px;
@@ -91,10 +48,48 @@
     width: 200px;
     max-height: 600px;
     overflow: visible;
-    background-color: #F7F7F7;
-    border: 1px solid #BBB;
-    padding: 10px;
+    padding: 0px;
+    z-index: 15000;    
+    background-color: #F7F7F7;    
 }
-#translator-list > div{
-    margin: 5px;
+#translator-list .translator-list{
+    border: 1px solid #BBB;
+    background-color: #F7F7F7; 
+    padding-top: 20px;
+}
+#translator-list .translator-list,
+#translator-list .translator-list *{
+    z-index: 1;    
+}
+#translator-list hr{
+    margin-top: 0px;
+}
+
+#translator-list ul{
+    margin:  0px;
+    padding: 0px;
+    list-style-type: none;
+    color: #333;
+}
+#translator-list ul li{
+    padding:3px 10px;
+}
+#translator-list ul li:hover{
+    background-color: #E3E2E2;
+    margin-left: -1px;
+    border-top: 1px solid #BBB;
+    border-bottom: 1px solid #BBB;
+}
+
+#translator-list ul a{
+    color: #333;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.translator-buttons img{
+    display: none;
+    float: left;
+    width: 30px;
 }
