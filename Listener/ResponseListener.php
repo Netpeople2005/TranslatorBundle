@@ -100,7 +100,7 @@ class ResponseListener
             foreach ($this->translator->getCurrentPageMessages()as $e) {
                 $html .= '<li><a href="#" title="' . htmlspecialchars($e['trans']) . '" data-json="'
                         . htmlspecialchars(json_encode($e)) . '">'
-                        . htmlspecialchars(substr($e['id'], 0, 80)) . '</a></li>' . PHP_EOL;
+                        . htmlspecialchars(substr($e['trans'], 0, 28)) . '</a></li>' . PHP_EOL;
             }
             
             $img = $this->assetHelper->getUrl('bundles/knptranslator/img/cargando.gif');

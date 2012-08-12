@@ -50,7 +50,7 @@ class TranslatorController
         $value = $this->request->get('value');
         $domain = $this->request->get('domain');
         $locale = $this->request->get('locale');
-        $parameters = $this->request->get('parameters');
+        $parameters = (array) $this->request->get('parameters');
         try {
             $success = $this->translator->update($id, $value, $domain, $locale);
             $trans = $value;
