@@ -34,7 +34,7 @@ class TranslatorController
         $id = urldecode($this->request->get('id'));
         $domain = urldecode($this->request->get('domain'));
         $locale = urldecode($this->request->get('locale'));
-        $parameters = $this->request->get('parameters');
+        $parameters = (array) $this->request->get('parameters');
 
         $this->translator->trans($id, $parameters, $domain, $locale);
 

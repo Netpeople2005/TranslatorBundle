@@ -74,6 +74,7 @@
 #translator-list ul li{
     padding:3px 10px;
 }
+#translator-list ul li.hover,
 #translator-list ul li:hover{
     background-color: #E3E2E2;
     margin-left: -1px;

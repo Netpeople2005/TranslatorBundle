@@ -163,7 +163,6 @@ class Translator extends BaseTranslator
             throw new InvalidTranslationKeyException('Empty key not allowed');
         }
         $resources = $this->getResources($locale, $domain);
-
         foreach ($resources as $resource) {
             if ($dumper = $this->getDumper($resource)) {
                 $success = $dumper->update($resource, $id, $value);

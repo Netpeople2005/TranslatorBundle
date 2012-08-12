@@ -17,7 +17,6 @@ $.fn.populate=function(json){
         var inputs = $(':input', this);
         inputs.each(function(index) {
             if ( $(this).attr('name') in json ){
-                console.info($(this).attr('name'));
                 $(this).val(json[$(this).attr('name')]);                
             }
         });
@@ -45,6 +44,8 @@ $(function(){
         $("#translator-list #translator-form").css({
             'top':$(this).offset().top - 5
         });
+        $("#translator-list ul li").removeClass('hover');
+        $(this).parent().addClass('hover');
         $(this).parent().append($("#translator-list #translator-form").show());
         $("#translator-form .translator-form").populate($(this).data('json'));
         $("#translator-form .translator-form").data({ 
@@ -58,9 +59,13 @@ $(function(){
             'top': "-1px"
         });
     });
-    $("#translator-list").on('mouseleave',function(){
-        $(this).stop();
-        $(this).animate({
+    $("body").on('click',function(event){
+        if($(event.target).is('#translator-list,#translator-list *')){
+            return;
+        }
+        $("#translator-list ul li").removeClass('hover');
+        $("#translator-list").stop();
+        $("#translator-list").animate({
             'top': calculeTranslatorListTop()
         });
         $("#translator-list #translator-form").hide();
