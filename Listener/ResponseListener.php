@@ -96,7 +96,7 @@ class ResponseListener
             $url = $this->assetHelper->getUrl('bundles/knptranslator/js/translator.js');
             $scripts .= sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
 
-            $html = $scripts . '<div id="translator-list"><div class="translator-list"><ul>' . PHP_EOL;
+            $html = $scripts . '<div id="translator-list" style="display: none;"><div class="translator-list"><ul>' . PHP_EOL;
             foreach ($this->translator->getCurrentPageMessages()as $e) {
                 $html .= '<li><a href="#" title="' . htmlspecialchars($e['trans']) . '" data-json="'
                         . htmlspecialchars(json_encode($e)) . '">'

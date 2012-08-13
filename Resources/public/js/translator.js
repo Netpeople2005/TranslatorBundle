@@ -38,7 +38,8 @@ $(function(){
         });
     });
     $("#translator-list").css({
-        'top' : calculeTranslatorListTop()
+        'top' : calculeTranslatorListTop(),
+        'display' : 'block'
     });
     $("#translator-list ul li a").on('click',function(){
         $("#translator-list #translator-form").css({
