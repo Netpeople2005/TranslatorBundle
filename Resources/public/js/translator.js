@@ -33,7 +33,7 @@ $(function(){
         json.parameters = $("#translator-form .translator-form").data('parameters');
         translatorLoading(true);
         $.getJSON(TRANSLATOR_URL, json , function(json){
-            translatorLoading(false);
+            translatorLoading(false,"Listo...!!!");
             $("#translator-form .translator-form").populate(json);
         });
     });
@@ -78,7 +78,7 @@ $(function(){
         json.parameters = $("#translator-form .translator-form").data('parameters');
         translatorLoading(true);
         $.post(TRANSLATOR_URL, json , function(json){
-            translatorLoading(false,"Guardado con Exito");
+            translatorLoading(false,"Guardado con Exito...!!!");
             $("#translator-form .translator-form").populate(json);
         });
     });
@@ -92,12 +92,14 @@ function translatorLoading(show, mensaje){
     if ( show === true ){
         $(".translator-buttons :submit").attr('disabled','disabled');
         $(".translator-buttons img").show(0);  
-        $("#translator-message").html("");
+        $("#translator-message").html("").show(0);
     }else if(show === false){
         $(".translator-buttons :submit").attr('disabled',false);
         $(".translator-buttons img").hide(0);
         $("#translator-message").html(mensaje == 'undefinde' ? '' : mensaje);
-        $("#translator-message").fadeOut(6000);
+        $("#translator-message").stop().show(0).fadeOut(6000,function(){
+            $(this).html('').show(0);
+        });
     }
 }
 
