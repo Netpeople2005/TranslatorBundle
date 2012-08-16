@@ -42,7 +42,7 @@
     color: #888;
 }
 #translator-list{
-    position: absolute;
+    position: fixed;
     right: 10px;
     top: -1000px;
     width: 200px;
