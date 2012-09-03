@@ -13,11 +13,18 @@ $.fn.populate=function(json){
     if ( $.type(json) !== 'object' ){
         return;
     }
+                console.log(json)
     this.each(function(form) {
         var inputs = $(':input', this);
         inputs.each(function(index) {
             if ( $(this).attr('name') in json ){
                 $(this).val(json[$(this).attr('name')]);                
+            }else if(/(.+)\[(.+)\]/.test($(this).attr('name'))){          
+                var name = $(this).attr('name').replace(']','')
+                name = name.split('[')
+                if ( name[0] in json ){
+                    $(this).val(json[name[0]][name[1]]);
+                }        
             }
         });
     });
@@ -43,7 +50,7 @@ $(function(){
     });
     $("#translator-list ul li a").on('click',function(){
         $("#translator-list #translator-form").css({
-            'top':$(this).offset().top - 5
+            //'top':$(this).offset().top - 5
         });
         $("#translator-list ul li").removeClass('hover');
         $(this).parent().addClass('hover');
@@ -54,7 +61,7 @@ $(function(){
             parameters : $(this).data('json').parameters
         });
     });
-    $("#translator-list").on('mouseenter',function(){
+    $("#translator-list").on('click',function(){
         $(this).stop();
         $(this).animate({
             'top': "-1px"

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -44,10 +45,17 @@ class Translator extends BaseTranslator
             $locale = $this->getLocale();
         }
 
+        $defaultLanguages = array(
+            'en' => $this->getCatalog('en')->get($id, $domain),
+            'es' => $this->getCatalog('es')->get($id, $domain),
+            'pt' => $this->getCatalog('pt')->get($id, $domain),
+        );
+        
         $value = $this->getCatalog($locale)->get($id, $domain);
-        
-        $this->currentPageMessages[$index] = compact('id', 'domain', 'locale', 'index', 'value', 'parameters', 'trans');        return $trans;
-        
+
+
+        $this->currentPageMessages[$index] = compact('id', 'domain', 'locale', 'index', 'value', 'parameters', 'trans', 'defaultLanguages');
+
         return $trans;
     }
 
@@ -207,4 +215,5 @@ class Translator extends BaseTranslator
 
         return $resources;
     }
+
 }

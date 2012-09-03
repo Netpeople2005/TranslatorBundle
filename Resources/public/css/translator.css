@@ -4,7 +4,7 @@
     min-height: 180px;
     background-color: #E3E2E2;
     border: 1px solid #BBB;
-    top: 0px;
+    top: 5px;
     left: -561px;
     z-index: -1 !important;;
     padding: 10px;
@@ -50,7 +50,8 @@
     overflow: visible;
     padding: 0px;
     z-index: 15000;    
-    background-color: #F7F7F7;    
+    background-color: #F7F7F7;
+    cursor: pointer;
 }
 #translator-list .translator-list{
     border: 1px solid #BBB;
@@ -68,14 +69,16 @@
 #translator-list ul{
     margin:  0px;
     padding: 0px;
+    overflow: auto;
+    max-height: 500px;
     list-style-type: none;
     color: #333;
+    cursor: default;
 }
 #translator-list ul li{
     padding:3px 10px;
 }
-#translator-list ul li.hover,
-#translator-list ul li:hover{
+#translator-list ul li.hover{
     background-color: #E3E2E2;
     margin-left: -1px;
     border-top: 1px solid #BBB;

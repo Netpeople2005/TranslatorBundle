@@ -84,8 +84,8 @@ class ResponseListener
 
         if (false !== $pos = $posrFunction($content, '</body>')) {
 
-            $url = $this->assetHelper->getUrl('bundles/knptranslator/js/jquery.min.js');
-            $scripts = PHP_EOL . sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
+            //$url = $this->assetHelper->getUrl('bundles/knptranslator/js/jquery.min.js');
+            $scripts = '';//PHP_EOL . sprintf('<script type="text/javascript" src="%s"></script>', $url) . PHP_EOL;
 
             $url = $this->router->generate('knplabs_translator_put');
             $locales = $this->translator->getLocales();
@@ -115,6 +115,12 @@ class ResponseListener
             <div><label>Locale: </label><select name="locale"></select></div>
             <div><label>Dominio: </label><input name="domain" type="text" readonly="readonly" /></div>
             <div><label>Valor: </label><textarea name="value"></textarea></div>
+            <fieldset>
+                <legend>Idiomas Predeterminados</legend>
+                <div><label>Español: </label><textarea class="textarea_es" name="defaultLanguages[es]"></textarea></div>
+                <div><label>Portugues: </label><textarea class="textarea_pt" name="defaultLanguages[pt]"></textarea></div>
+                <div><label>Ingles: </label><textarea class="textarea_en" name="defaultLanguages[en]"></textarea></div>
+            </fieldset>            
         </div>
         <hr/>
         <div class="translator-buttons">
