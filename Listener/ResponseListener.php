@@ -98,7 +98,7 @@ class ResponseListener
 
             $html = $scripts . '<div id="translator-list" style="display: none;"><div class="translator-list"><ul>' . PHP_EOL;
             foreach ($this->translator->getCurrentPageMessages()as $e) {
-                $html .= '<li><a href="#" title="' . htmlspecialchars($e['trans']) . '" data-json="'
+                $html .= '<li><a href="#" title="' . htmlspecialchars($e['trans']). '" data-id="' . $e['id'] . '" data-json="'
                         . htmlspecialchars(json_encode($e)) . '">'
                         . htmlspecialchars(substr($e['trans'], 0, 28)) . '</a></li>' . PHP_EOL;
             }
