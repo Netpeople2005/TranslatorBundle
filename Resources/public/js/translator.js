@@ -3,7 +3,16 @@ $.fn.toJSON=function(){
     this.each(function(form) {
         var inputs = $(':input', this);
         inputs.each(function(index) {
-            data[$(this).attr('name')] = $(this).val();
+            if(/(.+)\[(.+)\]/.test($(this).attr('name'))){          
+                var name = $(this).attr('name').replace(']','')
+                name = name.split('[') 
+                if (data[name[0]] == undefined){
+                    data[name[0]] = {};                                    
+                }
+                data[name[0]][name[1]] = $(this).val();                
+            }else{
+                data[$(this).attr('name')] = $(this).val();                
+            }
         });
     });
     return data;
@@ -13,7 +22,6 @@ $.fn.populate=function(json){
     if ( $.type(json) !== 'object' ){
         return;
     }
-                console.log(json)
     this.each(function(form) {
         var inputs = $(':input', this);
         inputs.each(function(index) {
@@ -51,7 +59,7 @@ $(function(){
     $("#translator-list ul li a").on('click',function(){
         $("#translator-list #translator-form").css({
             //'top':$(this).offset().top - 5
-        });
+            });
         $("#translator-list ul li").removeClass('hover');
         $(this).parent().addClass('hover');
         $(this).parent().append($("#translator-list #translator-form").show());
@@ -87,6 +95,7 @@ $(function(){
         $.post(TRANSLATOR_URL, json , function(json){
             translatorLoading(false,"Guardado con Exito...!!!");
             $("#translator-form .translator-form").populate(json);
+            $("#translator-list ul li a[data-id='" + json.id + "']").data('json',$("#translator-form .translator-form").toJSON());
         });
     });
 });
