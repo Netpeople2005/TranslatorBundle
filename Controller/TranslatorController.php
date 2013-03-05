@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -10,7 +11,7 @@
 
 namespace Knp\Bundle\TranslatorBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Knp\Bundle\TranslatorBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Bundle\TranslatorBundle\Exception\InvalidTranslationKeyException;
@@ -40,7 +41,7 @@ class TranslatorController
 
         $data = $this->translator->getCurrentPageMessages(md5($id));
 
-        return new Response(json_encode($data), 200, array('Content-Type' => 'application/json'));
+        return new JsonResponse($data);
     }
 
     public function postAction()
@@ -51,17 +52,21 @@ class TranslatorController
         $domain = $this->request->get('domain');
         $locale = $this->request->get('locale');
         $parameters = (array) $this->request->get('parameters');
+        $defaultLanguages = (array) $this->request->get('defaultLanguages');
         try {
             $success = $this->translator->update($id, $value, $domain, $locale);
             $trans = $value;
+
+            foreach ($defaultLanguages as $locale => $value) {
+                $success = $this->translator->update($id, $value, $domain, $locale);
+            }
         } catch (InvalidTranslationKeyException $e) {
             $success = false;
             $trans = $this->translator->trans($id, $parameters, $domain, $locale);
             $error = $e->getMessage();
         }
 
-        return new Response(json_encode(compact('id', 'value', 'domain')),
-                        $error ? 500 : 200, array('Content-Type' => 'application/json'));
+        return new JsonResponse(compact('id', 'value', 'domain'));
     }
 
 }

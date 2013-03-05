@@ -133,11 +133,15 @@ class XliffDumper implements DumperInterface
 
 }
 
-function dom_xpath_max($that, $nodes)
-{
-    usort($nodes, function($a, $b) {
-                return $b->value > $a->value;
-            });
+if (!function_exists('dom_xpath_max')) {
 
-    return $that[0]->value == $nodes[0]->value;
+    function dom_xpath_max($that, $nodes)
+    {
+        usort($nodes, function($a, $b) {
+                    return $b->value > $a->value;
+                });
+
+        return $that[0]->value == $nodes[0]->value;
+    }
+
 }
