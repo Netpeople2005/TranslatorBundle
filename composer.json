@@ -1,3 +1,7 @@
 {
-    "name": "netpeople/translation_editor"
+    "name": "netpeople/translation_editor",
+    "autoload": {
+        "psr-0": { "Knp\\Bundle\\TranslatorBundle\\": "" }
+    },
+    "target-dir": "Knp/Bundle/TranslatorBundle"
 }
