@@ -127,7 +127,7 @@ class ResponseListener
             <span id="translator-message"></span><img src="$img" />
             <input type="submit" value="Guardar"/>
         </div>
-    <form>
+    </form>
 </div></div>
 HTML;
 
